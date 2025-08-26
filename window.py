@@ -3,7 +3,7 @@ import tkinter as tk
 class WINDOW:
     def __init__(self, title="Title"):
         self.window=tk.Tk()
-        self.window.title("Title")
+        self.window.wm_title(title)
     def display(self):
         self.window.update()
     def move_to(self,x,y):
@@ -13,10 +13,11 @@ class WINDOW:
     def get_position(self):
         return self.window.winfo_x(),self.window.winfo_y()
 
-w=WINDOW()
+if __name__=="__main__":
+    w=WINDOW("Test")
 
-while True:
-    w.display()
-    x,y=w.get_position()
-    x+=1 # only int movement allowed
-    w.move_to(x,y)
+    while True:
+        w.display()
+        x,y=w.get_position()
+        x+=1 # only int movement allowed
+        w.move_to(x,y)
