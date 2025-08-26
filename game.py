@@ -9,11 +9,11 @@ def get_primary_monitor():
     return monitors[0]
 
 monitor=get_primary_monitor()
-print(f"Primary Monitor: {monitor.name}")
-print(f"Resolution: {monitor.width} x {monitor.height}")
-print(f"Position: ({monitor.x}, {monitor.y})")
+# print(f"Primary Monitor: {monitor.name}")
+# print(f"Resolution: {monitor.width} x {monitor.height}")
+# print(f"Position: ({monitor.x}, {monitor.y})")
 
-bird=WINDOW("Bird",False,False)
+bird=WINDOW("Bird",False,False,".\\assets\\bird.png",200,200)
 while True:
     bird.display()
     x,y=bird.get_position()
