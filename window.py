@@ -16,18 +16,22 @@ class ROOT:
 
 class WINDOW:
     def __init__(self, monitor, title="Title", resize_x=True, resize_y=True, 
-                 imagePath=None, width=300, height=300, x=None, y=None):
+                 imagePath=None, width=300, height=300, x=None, y=None,
+                 always_on_top=False):
         self.monitor = monitor
         self.window = tk.Toplevel()
         self.window.title(title)
         self.window.resizable(resize_x, resize_y)
         self.name = title
-        
+
         if x is not None and y is not None:
             self.window.geometry(f"{width}x{height}+{x}+{y}")
         else:
             self.window.geometry(f"{width}x{height}")
         
+        if always_on_top:
+            self.window.attributes('-topmost',True)
+
         self.photo = None    
         if imagePath:
             self.load_scaled_image(imagePath, width, height)
@@ -44,13 +48,13 @@ class WINDOW:
         self.window.destroy()
         print(f"{self.name} closed by user")
     
-    def __del__(self):
-        """Destructor - ensures window is destroyed when object is garbage collected"""
-        if not self._closed and self.window.winfo_exists():
-            self.window.destroy()
-            print(f"{self.name} deleted and window destroyed")
-        else:
-            print(f"{self.name} deleted (window already closed)")
+    # def __del__(self):
+    #     """Destructor - ensures window is destroyed when object is garbage collected"""
+    #     if not self._closed and self.window.winfo_exists():
+    #         self.window.destroy()
+    #         print(f"{self.name} deleted and window destroyed")
+    #     else:
+    #         print(f"{self.name} deleted (window already closed)")
     
     def display(self):
         if not self._closed:

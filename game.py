@@ -24,7 +24,7 @@ def add_pipe():
 
 add_pipe()
 def main():
-    bird=WINDOW(monitor,"Bird",False,False,".\\assets\\bird.png",200,200)
+    bird=WINDOW(monitor,"Bird",False,False,".\\assets\\bird.png",200,200,100,monitor.height//2,True)
     while True:
         try:            
             # bird.display()
