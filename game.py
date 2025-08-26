@@ -20,27 +20,38 @@ root=ROOT()
 def main():
     bird=WINDOW("Bird",False,False,".\\assets\\bird.png",200,200)
     bird2=WINDOW("Bird2",False,False,".\\assets\\bird.png",200,200)
+    db1,db2=False,False
     while True:
         try:            
             # bird.display()
             root.update()
 
-            x,y=bird.get_position()
-            width,height=bird.get_size()
-            if x+width>monitor.width or y+height>monitor.height:
-                break;
-            x+=1 
-            bird.move_to(x,y)
+            if not db1:
+                x,y=bird.get_position()
+                width,height=bird.get_size()
+                if x+width>monitor.width or y+height>monitor.height:
+                    del bird
+                    db1=True
+                else:
+                    x+=1 
+                    bird.move_to(x,y)
 
-            x,y=bird2.get_position()
-            width,height=bird2.get_size()
-            if x+width>monitor.width or y+height>monitor.height:
-                break;
-            y+=1 
-            bird2.move_to(x,y)
+            if not db2:
+                x,y=bird2.get_position()
+                width,height=bird2.get_size()
+                if x+width>monitor.width or y+height>monitor.height:
+                    del bird2
+                    db2=True
+                else:
+                    y+=1 
+                    bird2.move_to(x,y)
+            if db1 and db2:
+                break
+        
         except tk.TclError:
             break
-    del bird
+    if not db1:del bird
+    if not db2:del bird2
 
 if __name__=="__main__":
     main()
