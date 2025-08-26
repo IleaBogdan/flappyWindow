@@ -16,42 +16,34 @@ monitor=get_primary_monitor()
 
 root=ROOT()
 
+pipes=[]
+PIPE_WIDTH,PIPE_HEIGHT=100,400
+PIPE_IMAGE='./assets/pipe.png'
+def add_pipe():
+    pipes.append(WINDOW(monitor,"Pipe",False,False,PIPE_IMAGE,PIPE_WIDTH,PIPE_HEIGHT,monitor.width-PIPE_WIDTH-100,monitor.height-PIPE_HEIGHT))
 
+add_pipe()
 def main():
-    bird=WINDOW("Bird",False,False,".\\assets\\bird.png",200,200)
-    bird2=WINDOW("Bird2",False,False,".\\assets\\bird.png",200,200)
-    db1,db2=False,False
+    bird=WINDOW(monitor,"Bird",False,False,".\\assets\\bird.png",200,200)
     while True:
         try:            
             # bird.display()
             root.update()
+            x,y=bird.get_position()
+            x+=1 
+            bird.move_to(x,y)
 
-            if not db1:
-                x,y=bird.get_position()
-                width,height=bird.get_size()
-                if x+width>monitor.width or y+height>monitor.height:
-                    del bird
-                    db1=True
-                else:
-                    x+=1 
-                    bird.move_to(x,y)
+            i=0
+            for i in range(len(pipes)):
+                x,y=pipes[i].get_position()
+                if x==0:
+                    pipes[i].close()
+                    pipes[i]=WINDOW(monitor,"Pipe",False,False,PIPE_IMAGE,PIPE_WIDTH,PIPE_HEIGHT,monitor.width-PIPE_WIDTH-100,monitor.height-PIPE_HEIGHT)
+                x-=1
+                pipes[i].move_to(x,y)
 
-            if not db2:
-                x,y=bird2.get_position()
-                width,height=bird2.get_size()
-                if x+width>monitor.width or y+height>monitor.height:
-                    del bird2
-                    db2=True
-                else:
-                    y+=1 
-                    bird2.move_to(x,y)
-            if db1 and db2:
-                break
-        
         except tk.TclError:
             break
-    if not db1:del bird
-    if not db2:del bird2
 
 if __name__=="__main__":
     main()
