@@ -1,5 +1,6 @@
 from screeninfo import get_monitors
 from window import WINDOW,ROOT
+from objects import BIRD,PIPE
 import tkinter as tk
 
 def get_primary_monitor():
@@ -20,27 +21,23 @@ pipes=[]
 PIPE_WIDTH,PIPE_HEIGHT=100,400
 PIPE_IMAGE='./assets/pipe.png'
 def add_pipe():
-    pipes.append(WINDOW(monitor,"Pipe",False,False,PIPE_IMAGE,PIPE_WIDTH,PIPE_HEIGHT,monitor.width-PIPE_WIDTH-100,monitor.height-PIPE_HEIGHT))
+    pipes.append(PIPE(monitor))
 
 add_pipe()
 def main():
-    bird=WINDOW(monitor,"Bird",False,False,".\\assets\\bird.png",200,200,100,monitor.height//2,True)
+    bird=BIRD(monitor)
     while True:
         try:            
-            # bird.display()
             root.update()
-            x,y=bird.get_position()
-            x+=1 
-            bird.move_to(x,y)
-
-            i=0
+            bird.move()
+            
             for i in range(len(pipes)):
                 x,y=pipes[i].get_position()
                 if x==0:
-                    pipes[i].close()
-                    pipes[i]=WINDOW(monitor,"Pipe",False,False,PIPE_IMAGE,PIPE_WIDTH,PIPE_HEIGHT,monitor.width-PIPE_WIDTH-100,monitor.height-PIPE_HEIGHT)
+                    pipes.pop(0)
+                    add_pipe()
                 x-=1
-                pipes[i].move_to(x,y)
+                pipes[i].move()
 
         except tk.TclError:
             break

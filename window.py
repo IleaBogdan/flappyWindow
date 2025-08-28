@@ -98,6 +98,8 @@ class WINDOW:
             self._closed = True
             self.window.destroy()
             print(f"{self.name} manually closed")
+    def keep_on_top(self):
+        self.window.attributes('-topmost',True)
 
 # Example usage
 if __name__ == "__main__":
