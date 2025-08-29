@@ -1,5 +1,4 @@
 from screeninfo import get_monitors
-from libloader import load_libs
 from window import WINDOW,ROOT
 from objects import PIPE,BIRD
 import tkinter as tk
@@ -16,9 +15,6 @@ def add_pipe(pipes,monitor):
     pipes.append(PIPE(monitor))
 
 def main():
-    libs=load_libs()
-    # print(libs)
-    
     monitor=get_primary_monitor()
     # print(f"Primary Monitor: {monitor.name}")
     print(f"Resolution: {monitor.width} x {monitor.height}")
