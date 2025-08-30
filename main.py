@@ -87,6 +87,28 @@ def main():
             if not jumped:
                 bird.move()
             bird.on_top()
+
+
+            exit_game=False
+            bx,by=bird.get_position()
+            bx+=BIRD.BIRD_WIDTH
+            for i in range(len(pipes)):
+                x,y=pipes[i].get_position()
+                rx,ry=pipes[i].get_rposition()
+                ry+=PIPE.PIPE_HEIGHT
+
+
+                # if i==0: print(rx,ry,"----",bx,by)
+                if by<ry and (rx<bx and bx<rx+PIPE.PIPE_WIDTH):
+                    print("game over")
+                    exit_game=True
+                    break
+                if y<by and (x<bx and bx<x+PIPE.PIPE_WIDTH):
+                    print("game over")
+                    exit_game=True
+                    break
+
+            if exit_game: break
             root.update()
     except tk.TclError:
         pass
