@@ -21,19 +21,27 @@ class BIRD:
         self.window.keep_on_top()
 
 class PIPE:
-    PIPE_WIDTH,PIPE_HEIGHT=100,400
+    PIPE_WIDTH,PIPE_HEIGHT=100,300
     PIPE_IMAGE='./assets/pipe.png'
+    PIPE_RIMAGE='./assets/rpipe.png'
     MOVE_SET=3
     def __init__(self,monitor):
-        self.window=WINDOW(monitor,"Pipe",False,False,PIPE.PIPE_IMAGE,PIPE.PIPE_WIDTH,PIPE.PIPE_HEIGHT,monitor.width-PIPE.PIPE_WIDTH-100,monitor.height-PIPE.PIPE_HEIGHT,True)
+        self.window=WINDOW(monitor,"Pipe",False,False,None,PIPE.PIPE_WIDTH,PIPE.PIPE_HEIGHT,monitor.width-PIPE.PIPE_WIDTH-100,monitor.height-PIPE.PIPE_HEIGHT,True)
+        self.window.load_scaled_image(PIPE.PIPE_IMAGE, PIPE.PIPE_WIDTH, PIPE.PIPE_HEIGHT, scale_height_only=True, margin=2)
+        self.rwindow=WINDOW(monitor,"Pipe",False,False,None,PIPE.PIPE_WIDTH,PIPE.PIPE_HEIGHT,monitor.width-PIPE.PIPE_WIDTH-100,0,True)
+        self.rwindow.load_scaled_image(PIPE.PIPE_RIMAGE, PIPE.PIPE_WIDTH, PIPE.PIPE_HEIGHT, scale_height_only=True, margin=2)
     def __del__(self):
         try:
             self.window.close()
+            self.rwindow.close()
         except Exception as e:
             print(e)
     def move(self):
         x,y=self.window.get_position()
         x-=PIPE.MOVE_SET
         self.window.move_to(x,y)
+        x,y=self.rwindow.get_position()
+        x-=PIPE.MOVE_SET
+        self.rwindow.move_to(x,y)
     def get_position(self):
-        return self.window.get_position()    
+        return self.window.get_position()

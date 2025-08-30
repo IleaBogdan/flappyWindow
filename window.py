@@ -81,14 +81,23 @@ class WINDOW:
             return None, None
         return self.window.winfo_width(), self.window.winfo_height()
     
-    def load_scaled_image(self, imagePath, width, height):
+    def load_scaled_image(self, imagePath, width, height, scale_height_only=False, margin=2):
         try:
             image = Image.open(imagePath)
-            ratio = min(width/image.width, height/image.height)
-            new_size = (int(image.width * ratio), int(image.height * ratio))
+            if scale_height_only:
+                new_height = int(height) - 2 * margin
+                new_size = (image.width, new_height)
+            else:
+                ratio = min(width/image.width, height/image.height)
+                new_size = (int(image.width * ratio), int(image.height * ratio))
             resized = image.resize(new_size, Image.Resampling.LANCZOS)
             self.photo = ImageTk.PhotoImage(resized)
-            tk.Label(self.window, image=self.photo).pack(expand=True)
+            # Use Canvas to control placement
+            canvas = tk.Canvas(self.window, width=width, height=height, highlightthickness=0)
+            canvas.pack()
+            x = (width - new_size[0]) // 2
+            y = margin
+            canvas.create_image(x, y, anchor='nw', image=self.photo)
         except Exception as e:
             print(f"Error loading image: {e}")
     
