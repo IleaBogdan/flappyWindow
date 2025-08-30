@@ -63,26 +63,31 @@ def main():
             x, y = pipes[0].get_position()
             if x <= 30:
                 pipes.pop(0)
-
+            root.update()
             # try:
             #     data = q.get(timeout=0.1)
             # except Exception:
             #     data = None
-
-            bird.move()
-            bird.on_top()
             # if data:
             #     print(data)
             #     if data == b"Err": break
             #     if data == b" ":
             #         bird.jump()
-            key = kc.check(timeout=0.1) 
+            
+            jumped=False
+            key = kc.check(timeout=0.03) 
             if key is not None:
                 print(key)
                 if key=='space':
                     bird.jump()
+                    root.update()
+                    jumped=True
                 elif key=='esc':
                     break
+            if not jumped:
+                bird.move()
+            bird.on_top()
+            root.update()
     except tk.TclError:
         pass
     finally:
