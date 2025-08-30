@@ -1,4 +1,5 @@
-from receiver import init_pipe, start_pipe_listener
+# from receiver import init_pipe, start_pipe_listener
+from keycatcher import KeyCatcher
 from screeninfo import get_monitors
 from multiprocessing import Process
 from window import WINDOW,ROOT
@@ -26,16 +27,18 @@ def catch_keys():
     subprocess.run(['.\\bin\\keycatcher.exe'])
     print("running exe")
 
-def gameloop():
-    time.sleep(1)
-    pipe_name = r'\\.\pipe\MyPipe'
-    try:
-        handle = init_pipe(pipe_name)
-        q, stop_event = start_pipe_listener(handle)
-    except Exception as e:
-        print(e)
-        return
-    buffer = b""
+
+def main():
+    # time.sleep(1)
+    # pipe_name = r'\\.\pipe\MyPipe'
+    # try:
+    #     handle = init_pipe(pipe_name)
+    #     q, stop_event = start_pipe_listener(handle)
+    # except Exception as e:
+    #     print(e)
+    #     return
+    # buffer = b""
+    kc=KeyCatcher(suppress=True)
 
     monitor = get_primary_monitor()
     print(f"Resolution: {monitor.width} x {monitor.height}")
@@ -61,29 +64,30 @@ def gameloop():
             if x <= 30:
                 pipes.pop(0)
 
-            try:
-                data = q.get(timeout=0.1)
-            except Exception:
-                data = None
+            # try:
+            #     data = q.get(timeout=0.1)
+            # except Exception:
+            #     data = None
 
             bird.move()
             bird.on_top()
-            if data:
-                print(data)
-                if data == b"Err": break
-                if data == b" ":
+            # if data:
+            #     print(data)
+            #     if data == b"Err": break
+            #     if data == b" ":
+            #         bird.jump()
+            key = kc.check(timeout=0.1) 
+            if key is not None:
+                print(key)
+                if key=='space':
                     bird.jump()
+                elif key=='esc':
+                    break
     except tk.TclError:
         pass
     finally:
-        stop_event.set()
+        # stop_event.set()
         del root
-    
-
-def main():
-    exe_procces=multiprocessing.Process(target=catch_keys)
-    exe_procces.start()
-    gameloop()
 
 if __name__=="__main__":
     main()
