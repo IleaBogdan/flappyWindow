@@ -9,6 +9,7 @@ class BIRD:
         # print("You killed the bird")
         pass
     def move(self):
+        print("move bird move")
         x,y=self.window.get_position()
         y+=BIRD.MOVE_SET
         self.window.move_to(x,y)

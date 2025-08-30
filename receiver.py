@@ -3,6 +3,7 @@ import win32file
 import pywintypes
 import time
 import threading
+import queue
 
 def init_pipe(pipe_name):
     ok=False
@@ -36,39 +37,43 @@ def init_pipe(pipe_name):
     if not ok: raise("couldn't connect to pipe")
     return handle 
 
-def read_pipe(handle):
-    def read(handle,result_c):
+def pipe_reader_thread(handle, q, stop_event):
+    while not stop_event.is_set():
         try:
             result, data = win32file.ReadFile(handle, 64*1024)
-            result_c.append(data)
+            q.put(data)
         except Exception as e:
-            print(f"error: {e}")
-            result_c.append("Err")
-    result_c=[]
-    tr=threading.Thread(target=read,args=(handle, result_c))
-    tr.start()
-    tr.join(timeout=0.5)
-    if len(result_c):
-        return result_c[0]
-    return "TLE"     
+            q.put(b"Err")
+            break
 
+def start_pipe_listener(handle):
+    q = queue.Queue()
+    stop_event = threading.Event()
+    t = threading.Thread(target=pipe_reader_thread, args=(handle, q, stop_event), daemon=True)
+    t.start()
+    return q, stop_event
+
+# Usage example in your main loop:
 if __name__=="__main__":
     pipe_name = r'\\.\pipe\MyPipe'
-    handle=init_pipe(pipe_name)
+    handle = init_pipe(pipe_name)
     print("Connected! Reading data...\n")
 
+    q, stop_event = start_pipe_listener(handle)
     buffer = b""
-    while True:
-        data=read_pipe(handle)
-                
-        print(data)
-        if not data or data=="Err":
-            break
-        if data=="TLE":
-            continue
-
-        buffer += data
-        while b"\n" in buffer:
-            line, buffer = buffer.split(b"\n", 1)
-            if line:
-                print(line.decode("utf-8"))
+    try:
+        while True:
+            try:
+                data = q.get(timeout=1)  # Wait for data, or timeout after 1s
+            except queue.Empty:
+                continue
+            print(data)
+            if not data or data == "Err":
+                break
+            buffer += data
+            while b"\n" in buffer:
+                line, buffer = buffer.split(b"\n", 1)
+                if line:
+                    print(line.decode("utf-8"))
+    finally:
+        stop_event.set()

@@ -1,4 +1,4 @@
-from receiver import init_pipe,read_pipe
+from receiver import init_pipe, start_pipe_listener
 from screeninfo import get_monitors
 from multiprocessing import Process
 from window import WINDOW,ROOT
@@ -30,54 +30,54 @@ def gameloop():
     time.sleep(1)
     pipe_name = r'\\.\pipe\MyPipe'
     try:
-        handle=init_pipe(pipe_name)
+        handle = init_pipe(pipe_name)
+        q, stop_event = start_pipe_listener(handle)
     except Exception as e:
         print(e)
         return
-    buffer=b""
+    buffer = b""
 
-    monitor=get_primary_monitor()
-    # print(f"Primary Monitor: {monitor.name}")
+    monitor = get_primary_monitor()
     print(f"Resolution: {monitor.width} x {monitor.height}")
-    # print(f"Position: ({monitor.x}, {monitor.y})")
 
-    root=ROOT()
-    
-    pipes=[]
-    add_pipe(pipes,monitor)
+    root = ROOT()
+    pipes = []
+    add_pipe(pipes, monitor)
+    bird = BIRD(monitor)
 
-    bird=BIRD(monitor)
-
-    while True:
-        try:
+    try:
+        while True:
             root.update()
-
             for i in range(len(pipes)):
-                x,y=pipes[i].get_position()
+                x, y = pipes[i].get_position()
                 pipes[i].move()
-            if len(pipes)>0:
-                x,y=pipes[-1].get_position()
-                if x==monitor.width/2+100:
-                    add_pipe(pipes,monitor)
-            else: add_pipe(pipes,monitor)
-            x,y=pipes[0].get_position()
-            if x==0:
+            if len(pipes) > 0:
+                x, y = pipes[-1].get_position()
+                if x == monitor.width / 2 + 100:
+                    add_pipe(pipes, monitor)
+            else:
+                add_pipe(pipes, monitor)
+            x, y = pipes[0].get_position()
+            if x <= 30:
                 pipes.pop(0)
-            
-            data=read_pipe(handle)
+
+            try:
+                data = q.get(timeout=0.1)
+            except Exception:
+                data = None
+
+            bird.move()
+            bird.on_top()
             if data:
-                bird.move()
-                bird.on_top()
-                if data=="TLE": continue
-                if data=="Err": break
-                buffer+=data
-                while b"\n" in buffer:
-                    line,buffer=buffer.split(b"\n",1)
-                    if line:
-                        print(line)
-        except tk.TclError:
-            break
-    del root
+                print(data)
+                if data == b"Err": break
+                if data == b" ":
+                    bird.jump()
+    except tk.TclError:
+        pass
+    finally:
+        stop_event.set()
+        del root
     
 
 def main():
