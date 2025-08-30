@@ -1,8 +1,14 @@
+from receiver import init_pipe,read_pipe
 from screeninfo import get_monitors
+from multiprocessing import Process
 from window import WINDOW,ROOT
 from objects import PIPE,BIRD
+import multiprocessing
 import tkinter as tk
+import subprocess
 import threading
+import time
+import os
 
 def get_primary_monitor():
     monitors=get_monitors()
@@ -14,7 +20,22 @@ def get_primary_monitor():
 def add_pipe(pipes,monitor):
     pipes.append(PIPE(monitor))
 
-def main():
+def catch_keys():
+    # os.system('.\\bin\\keycatcher.exe') # running the keycatcher exe to start the pipe
+    # subprocess.Popen(['.\\bin\\keycatcher.exe'])
+    subprocess.run(['.\\bin\\keycatcher.exe'])
+    print("running exe")
+
+def gameloop():
+    time.sleep(1)
+    pipe_name = r'\\.\pipe\MyPipe'
+    try:
+        handle=init_pipe(pipe_name)
+    except Exception as e:
+        print(e)
+        return
+    buffer=b""
+
     monitor=get_primary_monitor()
     # print(f"Primary Monitor: {monitor.name}")
     print(f"Resolution: {monitor.width} x {monitor.height}")
@@ -43,11 +64,26 @@ def main():
             if x==0:
                 pipes.pop(0)
             
-            bird.move()
-            bird.on_top()
+            data=read_pipe(handle)
+            if data:
+                bird.move()
+                bird.on_top()
+                if data=="TLE": continue
+                if data=="Err": break
+                buffer+=data
+                while b"\n" in buffer:
+                    line,buffer=buffer.split(b"\n",1)
+                    if line:
+                        print(line)
         except tk.TclError:
             break
     del root
+    
+
+def main():
+    exe_procces=multiprocessing.Process(target=catch_keys)
+    exe_procces.start()
+    gameloop()
 
 if __name__=="__main__":
     main()

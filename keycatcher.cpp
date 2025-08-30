@@ -11,7 +11,7 @@ using namespace std;
     ofstream fout("keycatcher.txt");
 #endif
 
-const unordered_map<uint32_t,string>key_mapper={
+const unordered_map<DWORD,string>key_mapper={
     {0x20," "},
     {0x1B,"ESC"},
 };
@@ -23,17 +23,20 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam){
         KBDLLHOOKSTRUCT* pKey=(KBDLLHOOKSTRUCT*)lParam;
         
         if (wParam==WM_KEYDOWN || wParam==WM_SYSKEYDOWN){
-            #ifdef LOGFILE
-                // fout<<"Key pressed: "<<pKey->vkCode<<endl;
-                fout<<"Key pressed: "<<key_mapper.at(pKey->vkCode)<<endl;
-            #endif
-            WriteFile(
-                hPipe,
-                key_mapper.at(pKey->vkCode).c_str(),
-                (DWORD)key_mapper.at(pKey->vkCode).size(),
-                &written,
-                nullptr
-            );
+            if (key_mapper.count(pKey->vkCode)){
+                #ifdef LOGFILE
+                    // fout<<"Key pressed: "<<pKey->vkCode<<endl;
+                    fout<<pKey->vkCode;
+                    fout<<" - "<<key_mapper.at(pKey->vkCode)<<" - "<<key_mapper.count(pKey->vkCode)<<endl;
+                #endif
+                WriteFile(
+                    hPipe,
+                    key_mapper.at(pKey->vkCode).c_str(),
+                    (DWORD)key_mapper.at(pKey->vkCode).size(),
+                    &written,
+                    nullptr
+                );
+            }
             if (pKey->vkCode==VK_ESCAPE){ // Exit on Escape
                 PostQuitMessage(0);
                 return 1;

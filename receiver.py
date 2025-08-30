@@ -2,6 +2,7 @@ import win32pipe
 import win32file
 import pywintypes
 import time
+import threading
 
 def init_pipe(pipe_name):
     ok=False
@@ -15,6 +16,14 @@ def init_pipe(pipe_name):
                 win32file.OPEN_EXISTING,
                 0, None
             )
+            # timeout = 5000  # milliseconds
+            # win32pipe.SetNamedPipeHandleState(
+            #     handle, 
+            #     win32pipe.PIPE_READMODE_MESSAGE, 
+            #     None, 
+            #     timeout
+            # ) # setting read timeout
+
             ok=True
             print("Success")
             break  # success
@@ -27,26 +36,37 @@ def init_pipe(pipe_name):
     if not ok: raise("couldn't connect to pipe")
     return handle 
 
-def read_pipe(pipe_name):
-    try:
-        result, data = win32file.ReadFile(handle, 64*1024)
-    except Exception:
-        return None
-    return data
-        
+def read_pipe(handle):
+    def read(handle,result_c):
+        try:
+            result, data = win32file.ReadFile(handle, 64*1024)
+            result_c.append(data)
+        except Exception as e:
+            print(f"error: {e}")
+            result_c.append("Err")
+    result_c=[]
+    tr=threading.Thread(target=read,args=(handle, result_c))
+    tr.start()
+    tr.join(timeout=0.5)
+    if len(result_c):
+        return result_c[0]
+    return "TLE"     
 
 if __name__=="__main__":
     pipe_name = r'\\.\pipe\MyPipe'
     handle=init_pipe(pipe_name)
-    print("Connected! Reading numbers...\n")
+    print("Connected! Reading data...\n")
 
     buffer = b""
     while True:
-        data=read_pipe(pipe_name)
-        if not data:
-            break
-        
+        data=read_pipe(handle)
+                
         print(data)
+        if not data or data=="Err":
+            break
+        if data=="TLE":
+            continue
+
         buffer += data
         while b"\n" in buffer:
             line, buffer = buffer.split(b"\n", 1)
