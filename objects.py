@@ -1,11 +1,12 @@
 from window import WINDOW
+import tkinter as tk
 
 class BIRD:
     BIRD_IMAGE=".\\assets\\bird.png"
     MOVE_SET=3
     BIRD_WIDTH,BIRD_HEIGHT=200,200
     def __init__(self,monitor):
-        self.window=WINDOW(monitor,"Bird",False,False,BIRD.BIRD_IMAGE,BIRD.BIRD_WIDTH,BIRD.BIRD_HEIGHT,100,monitor.height//2,True)
+        self.window=WINDOW(monitor,"Bird",False,False,BIRD.BIRD_IMAGE,BIRD.BIRD_WIDTH,BIRD.BIRD_HEIGHT,200,monitor.height//2,True)
     def __del__(delf):
         # print("You killed the bird")
         pass
@@ -50,3 +51,19 @@ class PIPE:
         return self.window.get_position()
     def get_rposition(self):
         return self.rwindow.get_position()
+    
+
+class ScoreWindow:
+    def __init__(self,monitor):
+        WIDTH=200
+        self.window=WINDOW(monitor,"Score",False,False,None,WIDTH,50,monitor.width-WIDTH-100,50,True)
+        self.label=tk.Message(self.window.window,text="Score 0",width=WIDTH,font=("Arial",12))
+        self.label.pack(pady=10)
+        self.score=0
+    def __del__(self):
+        self.window.close()
+    def increase(self):
+        self.score+=1
+        self.label.config(text=f"Score: {self.score}")
+    def on_top(self):
+        self.window.keep_on_top()

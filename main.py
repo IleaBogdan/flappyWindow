@@ -3,7 +3,7 @@ from keycatcher import KeyCatcher
 from screeninfo import get_monitors
 from multiprocessing import Process
 from window import WINDOW,ROOT
-from objects import PIPE,BIRD
+from objects import PIPE,BIRD,ScoreWindow
 import multiprocessing
 import tkinter as tk
 import subprocess
@@ -47,7 +47,7 @@ def main():
     pipes = []
     add_pipe(pipes, monitor)
     bird = BIRD(monitor)
-
+    score=ScoreWindow(monitor)
     try:
         while True:
             root.update()
@@ -56,13 +56,14 @@ def main():
                 pipes[i].move()
             if len(pipes) > 0:
                 x, y = pipes[-1].get_position()
-                if x == monitor.width / 2 + 100:
+                if monitor.width*2/3-15<=x and x<=monitor.width*2/3:
                     add_pipe(pipes, monitor)
             else:
                 add_pipe(pipes, monitor)
             x, y = pipes[0].get_position()
             if x <= 30:
                 pipes.pop(0)
+                score.increase()
             root.update()
             # try:
             #     data = q.get(timeout=0.1)
@@ -86,7 +87,7 @@ def main():
                     break
             if not jumped:
                 bird.move()
-            bird.on_top()
+            #bird.on_top()
 
 
             exit_game=False
@@ -109,6 +110,7 @@ def main():
                     break
 
             if exit_game: break
+            score.on_top()
             root.update()
     except tk.TclError:
         pass
