@@ -1,5 +1,5 @@
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk # pyright: ignore[reportMissingImports]
 
 class ROOT:
     def __init__(self):
@@ -8,7 +8,7 @@ class ROOT:
     
     def __del__(self):
         self.root.destroy()
-        print("Root destroyed")
+        # print("Root destroyed")
     
     def update(self):
         self.root.update()
@@ -43,10 +43,9 @@ class WINDOW:
         self._closed = False
     
     def on_close(self):
-        """Handle window close by user"""
         self._closed = True
         self.window.destroy()
-        print(f"{self.name} closed by user")
+        # print(f"{self.name} closed by user")
     
     # def __del__(self):
     #     """Destructor - ensures window is destroyed when object is garbage collected"""
@@ -106,7 +105,7 @@ class WINDOW:
         if not self._closed:
             self._closed = True
             self.window.destroy()
-            print(f"{self.name} manually closed")
+            # print(f"{self.name} manually closed")
     def keep_on_top(self):
         self.window.attributes('-topmost',True)
 

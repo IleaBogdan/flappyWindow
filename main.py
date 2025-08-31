@@ -1,6 +1,6 @@
 # from receiver import init_pipe, start_pipe_listener
 from keycatcher import KeyCatcher
-from screeninfo import get_monitors
+from screeninfo import get_monitors # pyright: ignore[reportMissingImports]
 from multiprocessing import Process
 from window import WINDOW,ROOT
 from objects import PIPE,BIRD,ScoreWindow
@@ -78,7 +78,7 @@ def main():
             jumped=False
             key = kc.check(timeout=0.03) 
             if key is not None:
-                print(key)
+                # print(key)
                 if key=='space':
                     bird.jump()
                     root.update()
@@ -96,16 +96,16 @@ def main():
             for i in range(len(pipes)):
                 x,y=pipes[i].get_position()
                 rx,ry=pipes[i].get_rposition()
-                ry+=PIPE.PIPE_HEIGHT
-
+                height,rheight=pipes[i].get_heights()
+                ry+=rheight
 
                 # if i==0: print(rx,ry,"----",bx,by)
                 if by<ry and (rx<bx and bx<rx+PIPE.PIPE_WIDTH):
-                    print("game over")
+                    print(f"Game Over! Your score: {score.score}!")
                     exit_game=True
                     break
-                if y<by and (x<bx and bx<x+PIPE.PIPE_WIDTH):
-                    print("game over")
+                if y<by+bird.BIRD_HEIGHT and (x<bx and bx<x+PIPE.PIPE_WIDTH):
+                    print(f"Game Over! Your score: {score.score}!")
                     exit_game=True
                     break
 
@@ -113,6 +113,8 @@ def main():
             score.on_top()
             root.update()
     except tk.TclError:
+        pass
+    except Exception as e:
         pass
     finally:
         # stop_event.set()

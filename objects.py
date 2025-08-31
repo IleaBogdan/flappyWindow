@@ -1,5 +1,6 @@
 from window import WINDOW
 import tkinter as tk
+import random
 
 class BIRD:
     BIRD_IMAGE=".\\assets\\bird.png"
@@ -26,14 +27,18 @@ class BIRD:
 
 class PIPE:
     PIPE_WIDTH,PIPE_HEIGHT=100,300
+    PIPE_OFFSET=(-150,150)
     PIPE_IMAGE='./assets/pipe.png'
     PIPE_RIMAGE='./assets/rpipe.png'
     MOVE_SET=6
     def __init__(self,monitor):
-        self.window=WINDOW(monitor,"Pipe",False,False,None,PIPE.PIPE_WIDTH,PIPE.PIPE_HEIGHT,monitor.width-PIPE.PIPE_WIDTH-60,monitor.height-PIPE.PIPE_HEIGHT,True)
-        self.window.load_scaled_image(PIPE.PIPE_IMAGE, PIPE.PIPE_WIDTH, PIPE.PIPE_HEIGHT, scale_height_only=True, margin=2)
-        self.rwindow=WINDOW(monitor,"Pipe",False,False,None,PIPE.PIPE_WIDTH,PIPE.PIPE_HEIGHT,monitor.width-PIPE.PIPE_WIDTH-60,0,True)
-        self.rwindow.load_scaled_image(PIPE.PIPE_RIMAGE, PIPE.PIPE_WIDTH, PIPE.PIPE_HEIGHT, scale_height_only=True, margin=2)
+        rd=random.randrange(PIPE.PIPE_OFFSET[0],PIPE.PIPE_OFFSET[1])
+        self.height=PIPE.PIPE_HEIGHT+rd
+        self.rheight=PIPE.PIPE_HEIGHT-rd
+        self.window=WINDOW(monitor,"Pipe",False,False,None,PIPE.PIPE_WIDTH,self.height,monitor.width-PIPE.PIPE_WIDTH-60,monitor.height-self.height,True)
+        self.window.load_scaled_image(PIPE.PIPE_IMAGE, PIPE.PIPE_WIDTH, self.height, scale_height_only=True, margin=2)
+        self.rwindow=WINDOW(monitor,"Pipe",False,False,None,PIPE.PIPE_WIDTH,self.rheight,monitor.width-PIPE.PIPE_WIDTH-60,0,True)
+        self.rwindow.load_scaled_image(PIPE.PIPE_RIMAGE, PIPE.PIPE_WIDTH, self.rheight, scale_height_only=True, margin=2)
     def __del__(self):
         try:
             self.window.close()
@@ -51,6 +56,8 @@ class PIPE:
         return self.window.get_position()
     def get_rposition(self):
         return self.rwindow.get_position()
+    def get_heights(self):
+        return self.height,self.rheight
     
 
 class ScoreWindow:
